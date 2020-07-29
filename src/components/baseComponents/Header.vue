@@ -33,9 +33,6 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      line-height: 24px;
-      letter-spacing: 1px;
       color: #ffffff;
     }
   }

@@ -4,14 +4,24 @@
   </div>
 </template>
 
+
+
 <style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+
 #app {
   background: radial-gradient(
     82.33% 70.44% at 50% 0%,
     #26394d 0%,
     #212529 100%
   );
+  font-family: "Montserrat", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 }
+
 * {
   padding: 0px;
   margin: 0px;
