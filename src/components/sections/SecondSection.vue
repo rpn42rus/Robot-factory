@@ -44,17 +44,20 @@ export default {
   },
 
   computed: {
+    /**
+     * Свойство для получения и установки количества монет
+     */
     currentNumberCoins: {
       get() {
         return this.$store.getters.CURRENT_NUMBER_COINS; // получение lastOpenedRoomId из локального хранилища
       },
       set(numberCoins) {
-        this.$store.dispatch("getCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
+        this.$store.dispatch("setNumberCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
       }
     },
 
     /**
-     * Свойтво для получения и усатновки имени активного окна/выпадающего списка/контекстного меню
+     * Свойтво для получения и установки имени активного окна/выпадающего списка/контекстного меню
      */
     activeModal: {
       get() {

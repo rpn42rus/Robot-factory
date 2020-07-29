@@ -4,6 +4,7 @@
       <Header />
       <FirstSection />
       <SecondSection />
+      <ThirdSection />
 
       <ModalWindow v-if="activeModal === 'warning'" />
     </div>
@@ -12,9 +13,10 @@
 
 <script>
 import Header from "@/components/baseComponents/Header.vue";
+import ModalWindow from "@/components/baseComponents/ModalWindow.vue";
 import FirstSection from "@/components/sections/FirstSection.vue";
 import SecondSection from "@/components/sections/SecondSection.vue";
-import ModalWindow from "@/components/baseComponents/ModalWindow.vue";
+import ThirdSection from "@/components/sections/ThirdSection.vue";
 
 export default {
   name: "Home",
@@ -22,6 +24,7 @@ export default {
     Header,
     FirstSection,
     SecondSection,
+    ThirdSection,
     ModalWindow
   },
 
