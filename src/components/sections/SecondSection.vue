@@ -51,6 +51,18 @@ export default {
       set(numberCoins) {
         this.$store.dispatch("getCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
       }
+    },
+
+    /**
+     * Свойтво для получения и усатновки имени активного окна/выпадающего списка/контекстного меню
+     */
+    activeModal: {
+      get() {
+        return this.$store.getters.ACTIVE_MODAL;
+      },
+      set(newActiveModal) {
+        this.$store.dispatch("setActiveModal", newActiveModal);
+      }
     }
   },
 
@@ -61,7 +73,7 @@ export default {
     addCoins() {
       // проверка количества монет(если больше 100, то начисления прекращаются и отображается модалка)
       if (this.currentNumberCoins >= 100) {
-        // this.activeModal = "warning";
+        this.activeModal = "warning";
         this.fiveCoinsFlag = false;
       } else {
         // проверка на активный чекбокс и количество монет(если больше 95, то по 5 монет начислятся не будет)
@@ -69,7 +81,7 @@ export default {
           this.currentNumberCoins += 5;
         } else {
           this.fiveCoinsFlag = false;
-          // this.activeModal = "";
+          this.activeModal = "";
           this.currentNumberCoins++;
         }
       }
