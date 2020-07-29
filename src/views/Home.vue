@@ -2,17 +2,20 @@
   <div class="home">
     <div class="container">
       <Header />
+      <FirstSection />
     </div>
   </div>
 </template>
 
 <script>
 import Header from "@/components/baseComponents/Header.vue";
+import FirstSection from "@/components/sections/FirstSection.vue";
 
 export default {
   name: "Home",
   components: {
-    Header
+    Header,
+    FirstSection
   }
 };
 </script>
