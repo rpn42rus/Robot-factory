@@ -10,6 +10,7 @@
       <div class="title">Склад</div>
       <!-- Обертка -->
       <div class="store__wrapper">
+        <!-- Биомеханизм -->
         <div class="store">
           <div class="store__title">{{biomechanism.title}}</div>
           <div class="store__cost">Стоимость: {{biomechanism.costSale}} монет</div>
@@ -20,6 +21,7 @@
             v-on:click="saleComponent(biomechanism)"
           >Продать</div>
         </div>
+        <!-- Процессор -->
         <div class="store">
           <div class="store__title">{{CPU.title}}</div>
           <div class="store__cost">Стоимость: {{CPU.costSale}} монет</div>
@@ -30,6 +32,7 @@
             v-on:click="saleComponent(CPU)"
           >Продать</div>
         </div>
+        <!-- Душа -->
         <div class="store">
           <div class="store__title">{{soul.title}}</div>
           <div class="store__cost">Стоимость: {{soul.costSale}} монет</div>
@@ -51,14 +54,17 @@ export default {
 
   props: {
     biomechanism: {
-      type: Object
-    },
+      type: Object,
+      required: true
+    }, // биомеханизм
     CPU: {
-      type: Object
-    },
+      type: Object,
+      required: true
+    }, // процессор
     soul: {
-      type: Object
-    }
+      type: Object,
+      required: true
+    } // душа
   },
 
   computed: {
@@ -80,6 +86,7 @@ export default {
      * Метод продажи компонента робота
      */
     saleComponent(nameComponent) {
+      // если на складе есть детали и сумма текущего количества монет и цена продажи детали не превышает 100
       if (
         nameComponent.quantityInStock > 0 &&
         this.currentNumberCoins + nameComponent.costSale <= 100
@@ -87,21 +94,25 @@ export default {
         // прибавляем к текущему значению цену продажи
         this.currentNumberCoins += nameComponent.costSale;
 
-        let componentsKeysArray = Object.keys(nameComponent.components);
+        let componentsKeysArray = Object.keys(nameComponent.components); // переменная для хранения массива ключей из объекта components
+        let selectedComponentsCount = 0; // переменная для хранение количества выбранных компонентов
 
-        let selectedComponentsCount = 0;
+        // перебор свойств объекта components
         Object.values(nameComponent.components).forEach(currentElement => {
+          // если у компонента установлено состояние "selected", то увеличиваем количество selectedComponentsCount
           if (currentElement.state === "selected") {
             selectedComponentsCount++;
           }
         });
-        console.log("selectedComponentsCount", selectedComponentsCount);
 
+        // если сумма деталей на складе и количество выбранных компонентов <= длине массива компонентов
         if (
           nameComponent.quantityInStock + selectedComponentsCount <=
           componentsKeysArray.length
         ) {
+          // перебор массива ключей(начинается с конца)
           for (let i = componentsKeysArray.length - 1; i >= 0; i--) {
+            // если у компонента установлено состояние "ready", то изменяем его на "miss" и прерываем цикл
             if (
               nameComponent.components[componentsKeysArray[i]].state === "ready"
             ) {
