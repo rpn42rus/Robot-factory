@@ -10,6 +10,7 @@
       <div class="title">Рынок комплектующих</div>
       <!-- Обертка -->
       <div class="components__wrapper">
+        <!-- Биомеханизм -->
         <div class="component">
           <div class="component__icon">
             <img v-bind:src="biomechanism.iconUrl" alt />
@@ -22,6 +23,7 @@
             @click="buyComponent(biomechanism)"
           >Установить</div>
         </div>
+        <!-- Процессор -->
         <div class="component">
           <div class="component__icon">
             <img v-bind:src="CPU.iconUrl" alt />
@@ -34,6 +36,7 @@
             @click="buyComponent(CPU)"
           >Установить</div>
         </div>
+        <!-- Душа -->
         <div class="component">
           <div class="component__icon">
             <img v-bind:src="soul.iconUrl" alt />
@@ -55,8 +58,19 @@
 export default {
   name: "ThirdSection",
 
-  data() {
-    return {};
+  props: {
+    biomechanism: {
+      type: Object,
+      required: true
+    }, // биомеханизм
+    CPU: {
+      type: Object,
+      required: true
+    }, // процессор
+    soul: {
+      type: Object,
+      required: true
+    } // душа
   },
 
   computed: {
@@ -70,53 +84,31 @@ export default {
       set(numberCoins) {
         this.$store.dispatch("setNumberCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
       }
-    },
-
-    /**
-     * Свойство для получения и установки новых значений в объекте биомеханизма
-     */
-    biomechanism: {
-      get() {
-        return this.$store.getters.BIOMECHANISM; // получение объекта
-      },
-      set(biomechanismInfo) {
-        this.$store.dispatch("setInfoBiomechanism", biomechanismInfo); // вызов action из локального хранилища для записи в объект новых значений
-      }
-    },
-
-    /**
-     * Свойство для получения и установки новых значений в объекте биомеханизма
-     */
-    CPU: {
-      get() {
-        return this.$store.getters.CPU; // получение объекта
-      },
-      set(CPUInfo) {
-        this.$store.dispatch("setInfoBiomechanism", CPUInfo); // вызов action из локального хранилища для записи в объект новых значений
-      }
-    },
-
-    /**
-     * Свойство для получения и установки новых значений в объекте биомеханизма
-     */
-    soul: {
-      get() {
-        return this.$store.getters.SOUL; // получение объекта
-      },
-      set(soulInfo) {
-        this.$store.dispatch("setInfoBiomechanism", soulInfo); // вызов action из локального хранилища для записи в объект новых значений
-      }
     }
   },
 
   methods: {
+    /**
+     * Метод покупки деталей и добавления на склад
+     * Входные параметры:
+     *   nameComponent - имя компонента
+     */
     buyComponent(nameComponent) {
+      // если текущее количество монет больше или равно стоимости покупки
       if (this.currentNumberCoins >= nameComponent.costBuy) {
         // отнимаем от текущего значение цену покупки
         this.currentNumberCoins =
           Number(this.currentNumberCoins) - Number(nameComponent.costBuy);
         // увеличиваем количество комплектующего на складе
         nameComponent.quantityInStock++;
+        // цикл по компонентам детали
+        for (let component in nameComponent.components) {
+          // если состояние компонента = "miss", то изменяем его и прерываем цикл
+          if (nameComponent.components[component].state === "miss") {
+            nameComponent.components[component].state = "ready";
+            break;
+          }
+        }
       }
     }
   }

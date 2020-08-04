@@ -16,7 +16,7 @@
           <div class="store__count">{{biomechanism.quantityInStock}} шт</div>
           <div
             class="store__button"
-            :class="{'disabled__button': biomechanism.quantityInStock < 1}"
+            :class="{'disabled__button': biomechanism.quantityInStock < 1 || currentNumberCoins + biomechanism.costSale > 100}"
             v-on:click="saleComponent(biomechanism)"
           >Продать</div>
         </div>
@@ -26,7 +26,7 @@
           <div class="store__count">{{CPU.quantityInStock}} шт</div>
           <div
             class="store__button"
-            :class="{'disabled__button': CPU.quantityInStock < 1}"
+            :class="{'disabled__button': CPU.quantityInStock < 1 || currentNumberCoins + CPU.costSale > 100}"
             v-on:click="saleComponent(CPU)"
           >Продать</div>
         </div>
@@ -36,7 +36,7 @@
           <div class="store__count">{{soul.quantityInStock}} шт</div>
           <div
             class="store__button"
-            :class="{'disabled__button': soul.quantityInStock < 1}"
+            :class="{'disabled__button': soul.quantityInStock < 1 || currentNumberCoins + soul.costSale > 100}"
             @click="saleComponent(soul)"
           >Продать</div>
         </div>
@@ -49,6 +49,18 @@
 export default {
   name: "FourthSection",
 
+  props: {
+    biomechanism: {
+      type: Object
+    },
+    CPU: {
+      type: Object
+    },
+    soul: {
+      type: Object
+    }
+  },
+
   computed: {
     /**
      * Свойство для получения и установки количества монет
@@ -60,42 +72,6 @@ export default {
       set(numberCoins) {
         this.$store.dispatch("setNumberCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
       }
-    },
-
-    /**
-     * Свойство для получения и установки новых значений в объекте биомеханизма
-     */
-    biomechanism: {
-      get() {
-        return this.$store.getters.BIOMECHANISM; // получение объекта
-      },
-      set(biomechanismInfo) {
-        this.$store.dispatch("setInfoBiomechanism", biomechanismInfo); // вызов action из локального хранилища для записи в объект новых значений
-      }
-    },
-
-    /**
-     * Свойство для получения и установки новых значений в объекте биомеханизма
-     */
-    CPU: {
-      get() {
-        return this.$store.getters.CPU; // получение объекта
-      },
-      set(CPUInfo) {
-        this.$store.dispatch("setInfoBiomechanism", CPUInfo); // вызов action из локального хранилища для записи в объект новых значений
-      }
-    },
-
-    /**
-     * Свойство для получения и установки новых значений в объекте биомеханизма
-     */
-    soul: {
-      get() {
-        return this.$store.getters.SOUL; // получение объекта
-      },
-      set(soulInfo) {
-        this.$store.dispatch("setInfoBiomechanism", soulInfo); // вызов action из локального хранилища для записи в объект новых значений
-      }
     }
   },
 
@@ -104,10 +80,37 @@ export default {
      * Метод продажи компонента робота
      */
     saleComponent(nameComponent) {
-      if (nameComponent.quantityInStock > 0) {
+      if (
+        nameComponent.quantityInStock > 0 &&
+        this.currentNumberCoins + nameComponent.costSale <= 100
+      ) {
         // прибавляем к текущему значению цену продажи
-        this.currentNumberCoins =
-          Number(this.currentNumberCoins) + Number(nameComponent.costSale);
+        this.currentNumberCoins += nameComponent.costSale;
+
+        let componentsKeysArray = Object.keys(nameComponent.components);
+
+        let selectedComponentsCount = 0;
+        Object.values(nameComponent.components).forEach(currentElement => {
+          if (currentElement.state === "selected") {
+            selectedComponentsCount++;
+          }
+        });
+        console.log("selectedComponentsCount", selectedComponentsCount);
+
+        if (
+          nameComponent.quantityInStock + selectedComponentsCount <=
+          componentsKeysArray.length
+        ) {
+          for (let i = componentsKeysArray.length - 1; i >= 0; i--) {
+            if (
+              nameComponent.components[componentsKeysArray[i]].state === "ready"
+            ) {
+              nameComponent.components[componentsKeysArray[i]].state = "miss";
+              break;
+            }
+          }
+        }
+
         // уменьшаем количество на складе
         nameComponent.quantityInStock--;
       }

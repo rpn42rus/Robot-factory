@@ -1,5 +1,5 @@
 <template>
-  <div class="fifth-section">
+  <div class="fifth-section" id="fifth-section">
     <!-- Левая часть секции с её порядковым номером -->
     <div class="number__section">
       <div class="number">05</div>
@@ -74,113 +74,69 @@
           </div>
         </div>
         <!-- Блок с иконками компонентов и текстом для недостающих деталей -->
-        <!-- <div class="amount__components">
-          <div class="row__components" v-for="component in robot" :key="component.id">
-            <div class="component-wrapper" v-if="component.selected > 0">
-              <div v-if="component.id === 1">
-                <img
-                  src="../assets/img/robotComponents/hand3.png"
-                  alt
-                  class="image"
-                  v-for="item in component.selected"
-                  :key="item"
-                />
-              </div>
-              <div v-if="component.id === 2">
-                <img
-                  src="../assets/img/robotComponents/cpu3.png"
-                  alt
-                  class="image"
-                  v-for="item in component.selected"
-                  :key="item"
-                />
-              </div>
-              <div v-if="component.id === 3">
-                <img src="../assets/img/robotComponents/soul3.png" alt class="image" />
-              </div>
-            </div>
-
-            <div class="component-wrapper" v-if="component.readyForProduction">
-              <div v-if="component.id === 1">
-                <img
-                  src="../assets/img/robotComponents/hand2.png"
-                  alt
-                  class="image"
-                  v-on:click="setSelectedComponent(component.id)"
-                  v-for="item in component.readyForProduction"
-                  :key="item"
-                />
-              </div>
+        <div class="amount__components">
+          <div class="row__component">
+            <div class="component-wrapper">
               <div
-                class="icon-wrapper"
-                v-if="component.id === 2"
-                v-on:click="setSelectedComponent(component.id)"
+                class="component"
+                @click="setComponent(component.id, biomechanism)"
+                v-for="component in biomechanism.components"
+                :key="component.id"
               >
-                <img
-                  src="../assets/img/robotComponents/cpu2.png"
-                  alt
-                  class="image"
-                  v-for="item in component.readyForProduction"
-                  :key="item"
-                />
-              </div>
-              <div v-if="component.id === 3" v-on:click="setSelectedComponent(component.id)">
-                <img
-                  src="../assets/img/robotComponents/soul2.png"
-                  alt
-                  class="image"
-                  v-for="item in component.readyForProduction"
-                  :key="item"
-                />
+                <div class="miss" v-if="component.state === 'miss'"></div>
+                <div class="ready" v-if="component.state === 'ready'"></div>
+                <div class="selected" v-if="component.state === 'selected'"></div>
               </div>
             </div>
 
-            <div
-              class="component-wrapper"
-              v-if="component.missing && component.quantityInStock < 4"
-            >
-              <div v-if="component.id === 1">
-                <img
-                  src="../assets/img/robotComponents/hand1.png"
-                  alt
-                  class="image"
-                  v-for="item in component.missing"
-                  :key="item"
-                />
+            <div class="component-wrapper">
+              <div
+                class="component"
+                @click="setComponent(component.id, CPU)"
+                v-for="component in CPU.components"
+                :key="component.id"
+              >
+                <div class="miss" v-if="component.state === 'miss'"></div>
+                <div class="ready" v-if="component.state === 'ready'"></div>
+                <div class="selected" v-if="component.state === 'selected'"></div>
               </div>
-              <div v-if="component.id === 2">
-                <img
-                  src="../assets/img/robotComponents/cpu1.png"
-                  alt
-                  class="image"
-                  v-for="item in component.missing"
-                  :key="item"
-                />
-              </div>
-              <div v-if="component.id === 3">
-                <img src="../assets/img/robotComponents/soul1.png" alt class="image" />
+            </div>
+
+            <div class="component-wrapper">
+              <div
+                class="component"
+                @click="setComponent(component.id, soul)"
+                v-for="component in soul.components"
+                :key="component.id"
+              >
+                <div class="miss" v-if="component.state === 'miss'"></div>
+                <div class="ready" v-if="component.state === 'ready'"></div>
+                <div class="selected" v-if="component.state === 'selected'"></div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div
-            class="amount__components-text"
-            v-if="numberMissingHands > 0 || numberMissingCPU > 0 || numberMissingSoul > 0"
-          >
-            <p>
-              Для производства биоробота не хватает
-              <span
-                v-if="numberMissingHands > 0"
-              >{{checkDeclination(numberMissingHands, ['биомеханизм', 'биомеханизма'])}},</span> &nbsp;
-              <span
-                v-if="numberMissingCPU > 0"
-              >{{checkDeclination(numberMissingCPU, ['процессор', 'процессора'])}}</span> &nbsp;
-              <span v-if="numberMissingSoul > 0">
-                <span v-if="numberMissingHands > 0 || numberMissingCPU > 0">и</span> &nbsp; души
-              </span>
-            </p>
-          </div>
+        <!-- <div
+          class="amount__components-text"
+          v-if="numberMissingHands > 0 || numberMissingCPU > 0 || numberMissingSoul > 0"
+        >
+          <p>
+            Для производства биоробота не хватает
+            <span
+              v-if="numberMissingHands > 0"
+            >{{checkDeclination(numberMissingHands, ['биомеханизм', 'биомеханизма'])}},</span> &nbsp;
+            <span
+              v-if="numberMissingCPU > 0"
+            >{{checkDeclination(numberMissingCPU, ['процессор', 'процессора'])}}</span> &nbsp;
+            <span v-if="numberMissingSoul > 0">
+              <span v-if="numberMissingHands > 0 || numberMissingCPU > 0">и</span> &nbsp; души
+            </span>
+          </p>
         </div>-->
+
+        <!-- </div> -->
+
         <!-- Блок с картинкой робота -->
         <!-- <div class="kind__robot">
           <img v-bind:src="checkParametersRobot()" alt />
@@ -194,12 +150,56 @@
 export default {
   name: "FifthSection",
 
+  props: {
+    biomechanism: {
+      type: Object
+    },
+    CPU: {
+      type: Object
+    },
+    soul: {
+      type: Object
+    }
+  },
+
   data() {
     return {
       typeRobot: "FrontEnd", // флаг переключения радио кнопки для блока с типом робота
       stabilizerPicked: "Male", // флаг переключения радио кнопки для блока с стабилизатором
-      produceButtonActive: false // флаг для разблокировки кнопки "Произвести за 10 монет"
+      produceButtonActive: false, // флаг для разблокировки кнопки "Произвести за 10 монет"
+
+      select: []
     };
+  },
+
+  computed: {
+    /**
+     * Свойство для получения и установки количества монет
+     */
+    currentNumberCoins: {
+      get() {
+        return this.$store.getters.CURRENT_NUMBER_COINS; // получение lastOpenedRoomId из локального хранилища
+      },
+      set(numberCoins) {
+        this.$store.dispatch("setNumberCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
+      }
+    }
+  },
+
+  methods: {
+    getIcon(pic) {
+      return require("../../assets/img/robotComponents/" + pic);
+    },
+
+    setComponent(componentId, nameComponent) {
+      if (nameComponent.components[componentId].state === "ready") {
+        nameComponent.components[componentId].state = "selected";
+        nameComponent.quantityInStock--;
+      } else if (nameComponent.components[componentId].state === "selected") {
+        nameComponent.components[componentId].state = "ready";
+        nameComponent.quantityInStock++;
+      }
+    }
   }
 };
 </script>
@@ -383,7 +383,6 @@ export default {
             font-weight: 500;
             font-size: 14px;
             line-height: 24px;
-
             display: flex;
             justify-content: center;
             align-items: center;
@@ -400,21 +399,15 @@ export default {
         padding-left: 50px;
         display: flex;
         flex-direction: column;
-        .row__components {
+        .row__component {
           display: flex;
-          .component {
-            width: 20px;
-            height: 20px;
-            background: rgb(43, 216, 216);
-            margin: 5px;
-            &-wrapper {
-              div {
-                .image {
-                  margin-right: 10px;
-                  margin-bottom: 16px;
-                  cursor: pointer;
-                }
-              }
+          flex-direction: column;
+          align-items: flex-start;
+          .component-wrapper {
+            display: flex;
+            margin-bottom: 10px;
+            .component {
+              margin-right: 10px;
             }
           }
         }
@@ -438,5 +431,24 @@ export default {
       }
     }
   }
+}
+
+.miss {
+  height: 50px;
+  width: 50px;
+
+  background: url("../../assets/img/robotComponents/hand1.png") no-repeat;
+}
+.selected {
+  height: 50px;
+  width: 50px;
+
+  background: url("../../assets/img/robotComponents/hand3.png") no-repeat;
+}
+.ready {
+  height: 50px;
+  width: 50px;
+
+  background: url("../../assets/img/robotComponents/hand2.png") no-repeat;
 }
 </style>

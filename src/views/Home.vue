@@ -4,9 +4,9 @@
       <Header />
       <FirstSection />
       <SecondSection />
-      <ThirdSection />
-      <FourthSection />
-      <FifthSection />
+      <ThirdSection :soul="soul" :biomechanism="biomechanism" :CPU="CPU" />
+      <FourthSection :soul="soul" :biomechanism="biomechanism" :CPU="CPU" />
+      <FifthSection :soul="soul" :biomechanism="biomechanism" :CPU="CPU" />
 
       <ModalWindow v-if="activeModal === 'warning'" />
     </div>
@@ -36,7 +36,7 @@ export default {
 
   computed: {
     /**
-     * Свойтво для получения и усатновки имени активного окна/выпадающего списка/контекстного меню
+     * Свойтво для получения и усатновки имени активного модального окна
      */
     activeModal: {
       get() {
@@ -44,6 +44,42 @@ export default {
       },
       set(newActiveModal) {
         this.$store.dispatch("setActiveModal", newActiveModal);
+      }
+    },
+
+    /**
+     * Свойство для получения и установки новых значений в объекте биомеханизма
+     */
+    biomechanism: {
+      get() {
+        return this.$store.getters.BIOMECHANISM; // получение объекта
+      },
+      set(biomechanismInfo) {
+        this.$store.dispatch("setInfoBiomechanism", biomechanismInfo); // вызов action из локального хранилища для записи в объект новых значений
+      }
+    },
+
+    /**
+     * Свойство для получения и установки новых значений в объекте процессора
+     */
+    CPU: {
+      get() {
+        return this.$store.getters.CPU; // получение объекта
+      },
+      set(CPUInfo) {
+        this.$store.dispatch("setInfoBiomechanism", CPUInfo); // вызов action из локального хранилища для записи в объект новых значений
+      }
+    },
+
+    /**
+     * Свойство для получения и установки новых значений в объекте души
+     */
+    soul: {
+      get() {
+        return this.$store.getters.SOUL; // получение объекта
+      },
+      set(soulInfo) {
+        this.$store.dispatch("setInfoBiomechanism", soulInfo); // вызов action из локального хранилища для записи в объект новых значений
       }
     }
   }
