@@ -5,30 +5,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
-		currentNumberCoins: 100,
+		currentNumberCoins: 0,
 
 		activeModal: '',  // переменная для хранения наименования активного модального окна 
-
-		missingComponents: {
-			id: 1,
-			biomechanism: 4,
-			CPU: 4,
-			soul: 1
-		},
-
-		readyComponents: {
-			id: 2,
-			biomechanism: 0,
-			CPU: 0,
-			soul: 0
-		},
-
-		productionComponents: {
-			id: 3,
-			biomechanism: 0,
-			CPU: 0,
-			soul: 0
-		},
 
 		biomechanism: {
 			name: "biomechanism",
@@ -36,6 +15,7 @@ export default new Vuex.Store({
 			costBuy: 7, // стоимость покупки
 			costSale: 5, // стоимость продажи
 			quantityInStock: 0, // наличие на складе
+			numberMissing: 4,
 			components: {
 				1: {
 					id: 1,
@@ -55,11 +35,6 @@ export default new Vuex.Store({
 				},
 			},
 			iconUrl: require("@/assets/img/icon 5.png"), // иконка
-			icons: [
-				{ src: "hand1.png", name: "missingIcon" },
-				{ src: "hand2.png", name: "selectedIcon" },
-				{ src: "hand3.png", name: "readyIcon" },
-			],
 		},
 
 		CPU: {
@@ -68,6 +43,7 @@ export default new Vuex.Store({
 			costBuy: 5, // стоимость покупки
 			costSale: 3, // стоимость продажи
 			quantityInStock: 0, // наличие на складе
+			numberMissing: 4,
 			components: {
 				1: {
 					id: 1,
@@ -95,6 +71,7 @@ export default new Vuex.Store({
 			costBuy: 25, // стоимость покупки
 			costSale: 15, // стоимость продажи
 			quantityInStock: 0, // наличие на складе
+			numberMissing: 1,
 			components: {
 				1: {
 					id: 1,
@@ -138,27 +115,6 @@ export default new Vuex.Store({
 		},
 
 		/**
-		* Установка новых значений в объект
-		*/
-		SET_READY_COMPONENT(state, components) {
-			state.readyComponents = components;
-		},
-
-		/**
-		* Установка новых значений в объект
-		*/
-		SET_MISSING_COMPONENT(state, component) {
-			state.missingComponents = component;
-		},
-
-		/**
-		* Установка новых значений в объект
-		*/
-		SET_PRODUCTION_COMPONENT(state, component) {
-			state.productionComponents = component;
-		},
-
-		/**
 		* Установка имени модального окна в activeModalName
 		*/
 		SET_ACTIVE_MODAL(state, activeModalName) {
@@ -197,27 +153,6 @@ export default new Vuex.Store({
 		},
 
 		/**
-		* Метод установки информации об объекте biomechanism
-		*/
-		setReadyComponents({ commit }, component) {
-			commit('SET_READY_COMPONENTS', component);
-		},
-
-		/**
-		* Метод установки информации об объекте biomechanism
-		*/
-		setMissingComponent({ commit }, component) {
-			commit('SET_MISSING_COMPONENT', component);
-		},
-
-		/**
-	* Метод установки информации об объекте biomechanism
-	*/
-		setProductionComponent({ commit }, component) {
-			commit('SET_PRODUCTION_COMPONENT', component);
-		},
-
-		/**
 		* Метод установки модального окна
 		*/
 		setActiveModal({ commit }, activeModalName) {
@@ -245,21 +180,6 @@ export default new Vuex.Store({
 		* Получение объекта с инфо о душе
 		*/
 		SOUL: state => state.soul,
-
-		/**
-		* Получение объекта
-		*/
-		READY_COMPONENTS: state => state.readyComponents,
-
-		/**
-		* Получение объекта
-		*/
-		MISSING_COMPONENTS: state => state.missingComponents,
-
-		/**
-			* Получение объекта
-			*/
-		PRODUCTION_COMPONENTS: state => state.productionComponents,
 
 		/**
 		* Получение состояния(имени модального окна) activeModal

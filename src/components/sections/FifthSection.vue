@@ -66,16 +66,17 @@
               </div>
             </div>
           </div>
-          <div class="produce__button" v-on:click="produceRobot()">
+          <div class="produce__button" @click="produceRobot()">
             <div
               class="button__title"
-              v-bind:class="produceButtonActive === true ? 'normal' : 'missing'"
+              :class="availabilityOfParts === 'productionParts' && currentNumberCoins >= 10 ? 'normal' : 'missing'"
             >Произвести за 10 монет</div>
           </div>
         </div>
         <!-- Блок с иконками компонентов и текстом для недостающих деталей -->
         <div class="amount__components">
           <div class="row__component">
+            <!-- Биомеханизм -->
             <div class="component-wrapper">
               <div
                 class="component"
@@ -83,12 +84,12 @@
                 v-for="component in biomechanism.components"
                 :key="component.id"
               >
-                <div class="miss" v-if="component.state === 'miss'"></div>
-                <div class="ready" v-if="component.state === 'ready'"></div>
-                <div class="selected" v-if="component.state === 'selected'"></div>
+                <div
+                  :class="{'missBiomech': component.state === 'miss', 'readyBiomech': component.state === 'ready', 'selectedBiomech': component.state === 'selected'}"
+                ></div>
               </div>
             </div>
-
+            <!-- Процессор -->
             <div class="component-wrapper">
               <div
                 class="component"
@@ -96,12 +97,12 @@
                 v-for="component in CPU.components"
                 :key="component.id"
               >
-                <div class="miss" v-if="component.state === 'miss'"></div>
-                <div class="ready" v-if="component.state === 'ready'"></div>
-                <div class="selected" v-if="component.state === 'selected'"></div>
+                <div
+                  :class="{'missCPU': component.state === 'miss', 'readyCPU': component.state === 'ready', 'selectedCPU': component.state === 'selected'}"
+                ></div>
               </div>
             </div>
-
+            <!-- Душа -->
             <div class="component-wrapper">
               <div
                 class="component"
@@ -109,38 +110,33 @@
                 v-for="component in soul.components"
                 :key="component.id"
               >
-                <div class="miss" v-if="component.state === 'miss'"></div>
-                <div class="ready" v-if="component.state === 'ready'"></div>
-                <div class="selected" v-if="component.state === 'selected'"></div>
+                <div
+                  :class="{'missSoul': component.state === 'miss', 'readySoul': component.state === 'ready', 'selectedSoul': component.state === 'selected'}"
+                ></div>
               </div>
             </div>
           </div>
+
+          <div class="amount__components-text" v-if="availabilityOfParts !== 'productionParts'">
+            <p>
+              Для производства биоробота не хватает
+              <span
+                v-if="biomechanism.numberMissing > 0"
+              >{{checkDeclination(biomechanism.numberMissing, ['биомеханизм', 'биомеханизма'])}},</span> &nbsp;
+              <span
+                v-if="CPU.numberMissing > 0"
+              >{{checkDeclination(CPU.numberMissing, ['процессор', 'процессора'])}}</span> &nbsp;
+              <span v-if="soul.numberMissing > 0">
+                <span v-if="biomechanism.numberMissing > 0 || CPU.numberMissing > 0">и</span> &nbsp; души
+              </span>
+            </p>
+          </div>
         </div>
 
-        <!-- <div
-          class="amount__components-text"
-          v-if="numberMissingHands > 0 || numberMissingCPU > 0 || numberMissingSoul > 0"
-        >
-          <p>
-            Для производства биоробота не хватает
-            <span
-              v-if="numberMissingHands > 0"
-            >{{checkDeclination(numberMissingHands, ['биомеханизм', 'биомеханизма'])}},</span> &nbsp;
-            <span
-              v-if="numberMissingCPU > 0"
-            >{{checkDeclination(numberMissingCPU, ['процессор', 'процессора'])}}</span> &nbsp;
-            <span v-if="numberMissingSoul > 0">
-              <span v-if="numberMissingHands > 0 || numberMissingCPU > 0">и</span> &nbsp; души
-            </span>
-          </p>
-        </div>-->
-
-        <!-- </div> -->
-
         <!-- Блок с картинкой робота -->
-        <!-- <div class="kind__robot">
+        <div class="kind__robot">
           <img v-bind:src="checkParametersRobot()" alt />
-        </div>-->
+        </div>
       </div>
     </div>
   </div>
@@ -152,27 +148,39 @@ export default {
 
   props: {
     biomechanism: {
-      type: Object
-    },
+      type: Object,
+      required: true
+    }, // биомеханизм
     CPU: {
-      type: Object
-    },
+      type: Object,
+      required: true
+    }, // процессор
     soul: {
-      type: Object
-    }
+      type: Object,
+      required: true
+    } // душа
   },
 
   data() {
     return {
       typeRobot: "FrontEnd", // флаг переключения радио кнопки для блока с типом робота
-      stabilizerPicked: "Male", // флаг переключения радио кнопки для блока с стабилизатором
-      produceButtonActive: false, // флаг для разблокировки кнопки "Произвести за 10 монет"
-
-      select: []
+      stabilizerPicked: "Male" // флаг переключения радио кнопки для блока с стабилизатором
     };
   },
 
   computed: {
+    /**
+     * Свойтво для получения и усатновки имени активного окна/выпадающего списка/контекстного меню
+     */
+    activeModal: {
+      get() {
+        return this.$store.getters.ACTIVE_MODAL;
+      },
+      set(newActiveModal) {
+        this.$store.dispatch("setActiveModal", newActiveModal);
+      }
+    },
+
     /**
      * Свойство для получения и установки количества монет
      */
@@ -183,21 +191,154 @@ export default {
       set(numberCoins) {
         this.$store.dispatch("setNumberCoins", numberCoins); // вызов action из локального хранилища для записи в lastOpenedRoomId значение roomId
       }
+    },
+
+    /**
+     * Свойство проверки наличия деталей для производства
+     */
+    availabilityOfParts() {
+      let statesArray = []; // переменная для хранения всех состояний деталей
+      let stateComponents = "productionParts"; // переменная для хранения общего состояния
+
+      // перебор деталей биомеханизма и добавление в массив состояний деталей
+      for (let bioComponent in this.biomechanism.components) {
+        statesArray.push(this.biomechanism.components[bioComponent].state);
+      }
+      // перебор деталей процессора и добавление в массив состояний деталей
+      for (let cpuComponent in this.CPU.components) {
+        statesArray.push(this.CPU.components[cpuComponent].state);
+      }
+      // добавление в массив состояния компонента души
+      statesArray.push(this.soul.components[1].state);
+
+      // перебор массива состояний всех деталей
+      for (let i in statesArray) {
+        // если есть состояние miss, устанавливаем переменной значение missingParts и прерываем цикл
+        if (statesArray[i] === "miss") {
+          stateComponents = "missingParts";
+          break;
+          // если есть состояние ready и нет ни одного с состояние miss, устанавливаем переменной значение readyParts
+        } else if (statesArray[i] !== "miss" && statesArray[i] === "ready") {
+          stateComponents = "readyParts";
+        }
+      }
+
+      return stateComponents; // возвращается общее состояние готовности компонентов
     }
   },
 
   methods: {
-    getIcon(pic) {
-      return require("../../assets/img/robotComponents/" + pic);
+    /**
+     * Метод проверки выбранных параметров и установленных деталей для подставления соответствующей иконки
+     */
+    checkParametersRobot() {
+      if (this.availabilityOfParts === "missingParts") {
+        if (this.typeRobot === "FrontEnd" && this.stabilizerPicked === "Male") {
+          return require("../../assets/img/robots/FrontMale3.png");
+        } else if (
+          this.typeRobot === "FrontEnd" &&
+          this.stabilizerPicked === "Famale"
+        ) {
+          return require("../../assets/img/robots/FrontFamale3.png");
+        } else if (
+          this.typeRobot === "Design" &&
+          this.stabilizerPicked === "Male"
+        ) {
+          return require("../../assets/img/robots/DesignerMale3.png");
+        } else if (
+          this.typeRobot === "Design" &&
+          this.stabilizerPicked === "Famale"
+        ) {
+          return require("../../assets/img/robots/DesignerFamale3.png");
+        }
+      } else if (this.availabilityOfParts === "readyParts") {
+        if (this.typeRobot === "FrontEnd" && this.stabilizerPicked === "Male") {
+          return require("../../assets/img/robots/FrontMale2.png");
+        } else if (
+          this.typeRobot === "FrontEnd" &&
+          this.stabilizerPicked === "Famale"
+        ) {
+          return require("../../assets/img/robots/FrontFamale2.png");
+        } else if (
+          this.typeRobot === "Design" &&
+          this.stabilizerPicked === "Male"
+        ) {
+          return require("../../assets/img/robots/DesignerMale2.png");
+        } else if (
+          this.typeRobot === "Design" &&
+          this.stabilizerPicked === "Famale"
+        ) {
+          return require("../../assets/img/robots/DesignerFamale2.png");
+        }
+      } else if (this.availabilityOfParts === "productionParts") {
+        if (this.typeRobot === "FrontEnd" && this.stabilizerPicked === "Male") {
+          return require("../../assets/img/robots/FrontMale1.png");
+        } else if (
+          this.typeRobot === "FrontEnd" &&
+          this.stabilizerPicked === "Famale"
+        ) {
+          return require("../../assets/img/robots/FrontFamale1.png");
+        } else if (
+          this.typeRobot === "Design" &&
+          this.stabilizerPicked === "Male"
+        ) {
+          return require("../../assets/img/robots/DesignerMale1.png");
+        } else if (
+          this.typeRobot === "Design" &&
+          this.stabilizerPicked === "Famale"
+        ) {
+          return require("../../assets/img/robots/DesignerFamale1.png");
+        }
+      }
     },
 
+    /**
+     * Метод смены состояния компонента
+     * Входные параметры:
+     *    componentId - id детали
+     * 		nameComponent - имя компонента
+     */
     setComponent(componentId, nameComponent) {
+      // если установлено состояние "ready", то меняем на "selected" и уменьшаем количество деталей на складе и недостающих
       if (nameComponent.components[componentId].state === "ready") {
         nameComponent.components[componentId].state = "selected";
         nameComponent.quantityInStock--;
+        nameComponent.numberMissing--;
+        // если установлено состояние "selected", то меняем на "ready" и увеличиваем количество деталей на складе и недостающих
       } else if (nameComponent.components[componentId].state === "selected") {
         nameComponent.components[componentId].state = "ready";
         nameComponent.quantityInStock++;
+        nameComponent.numberMissing++;
+      }
+    },
+
+    /**
+     * Функция для склонения количества лет
+     * @param number (number) - числительная переменная
+     * @param titles (string) - массив из форм слова при разных числовых значениях
+     */
+    checkDeclination(number, titles) {
+      const cases = [2, 0, 1, 1, 1, 2]; // в переменной хранятся индексы из массива
+      return (
+        number +
+        " " +
+        titles[
+          number % 100 > 4 && number % 100 < 20
+            ? 2
+            : cases[number % 10 < 5 ? number % 10 : 5]
+        ]
+      );
+    },
+
+    /**
+     * Метод производства робота и открытия модального окна
+     */
+    produceRobot() {
+      if (
+        this.availabilityOfParts === "productionParts" &&
+        this.currentNumberCoins >= 10
+      ) {
+        this.activeModal = "succsess";
       }
     }
   }
@@ -374,7 +515,6 @@ export default {
         .produce__button {
           width: 236px;
           height: 48px;
-          border: 2px solid #4c5865;
           box-sizing: border-box;
           border-radius: 60px;
           color: #4c5865;
@@ -388,8 +528,6 @@ export default {
             align-items: center;
           }
           &:hover {
-            color: #fff;
-            background: #ff5722;
             cursor: pointer;
           }
         }
@@ -433,22 +571,73 @@ export default {
   }
 }
 
-.miss {
+.missBiomech {
   height: 50px;
   width: 50px;
-
   background: url("../../assets/img/robotComponents/hand1.png") no-repeat;
 }
-.selected {
+.selectedBiomech {
   height: 50px;
   width: 50px;
-
   background: url("../../assets/img/robotComponents/hand3.png") no-repeat;
+  cursor: pointer;
 }
-.ready {
+.readyBiomech {
   height: 50px;
   width: 50px;
-
   background: url("../../assets/img/robotComponents/hand2.png") no-repeat;
+  cursor: pointer;
+}
+.missCPU {
+  height: 50px;
+  width: 50px;
+  background: url("../../assets/img/robotComponents/cpu1.png") no-repeat;
+}
+.selectedCPU {
+  height: 50px;
+  width: 50px;
+  background: url("../../assets/img/robotComponents/cpu3.png") no-repeat;
+  cursor: pointer;
+}
+.readyCPU {
+  height: 50px;
+  width: 50px;
+  background: url("../../assets/img/robotComponents/cpu2.png") no-repeat;
+  cursor: pointer;
+}
+.missSoul {
+  height: 50px;
+  width: 50px;
+  background: url("../../assets/img/robotComponents/soul1.png") no-repeat;
+}
+.selectedSoul {
+  height: 50px;
+  width: 50px;
+  background: url("../../assets/img/robotComponents/soul3.png") no-repeat;
+  cursor: pointer;
+}
+.readySoul {
+  height: 50px;
+  width: 50px;
+  background: url("../../assets/img/robotComponents/soul2.png") no-repeat;
+  cursor: pointer;
+}
+
+/* Активная кнопка "произвести" */
+.normal {
+  color: #ffffff;
+  border-radius: 60px;
+  border: 2px solid #ff7f22;
+  &:hover {
+    background: #ff5722;
+  }
+}
+
+/* Заблокированная кнопка "произвести" */
+.missing {
+  color: #4c5865;
+  border-radius: 60px;
+  border: 2px solid #4c5865;
+  cursor: not-allowed;
 }
 </style>

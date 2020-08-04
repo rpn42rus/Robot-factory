@@ -43,7 +43,9 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "vue/no-side-effects-in-computed-properties": "off"
+    }
   },
   "browserslist": [
     "> 1%",

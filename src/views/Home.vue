@@ -8,7 +8,7 @@
       <FourthSection :soul="soul" :biomechanism="biomechanism" :CPU="CPU" />
       <FifthSection :soul="soul" :biomechanism="biomechanism" :CPU="CPU" />
 
-      <ModalWindow v-if="activeModal === 'warning'" />
+      <ModalWindow />
     </div>
   </div>
 </template>
